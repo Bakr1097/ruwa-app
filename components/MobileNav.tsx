@@ -8,7 +8,8 @@ interface MobileNavProps {
   userRole: string;
 }
 
-export function MobileNav({ userName: _userName, userRole: _userRole }: MobileNavProps) {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export function MobileNav({ userName, userRole }: MobileNavProps) {
   const pathname = usePathname();
 
   const handleSignOut = async () => {
