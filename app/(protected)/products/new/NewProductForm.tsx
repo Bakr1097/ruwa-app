@@ -203,7 +203,7 @@ export function NewProductForm({ fabrics }: { fabrics: Fabric[] }) {
               <div className="flex-1 space-y-1">
                 <Label className="text-xs text-muted-foreground font-normal">Size</Label>
                 <Input
-                  placeholder="S / M / Free"
+                  placeholder="S / M / L / XL / Free Size"
                   value={v.size}
                   onChange={(e) => updateVariant(i, "size", e.target.value)}
                 />
