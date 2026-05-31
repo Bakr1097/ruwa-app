@@ -1,0 +1,27 @@
+Phase 2, step 2 of 3: Products & variants UI. The schema from step 1 is already migrated. Do NOT touch production jobs yet.
+
+Match all existing app patterns: server actions return void and throw on error, client navigates via window.location.href after a clean return, NEVER call redirect() inside server actions, unstable_noStore() on list/detail pages, CSS-variable theme tokens only (no hardcoded colors), reuse components/ui primitives, Drizzle for all DB ops, getServerSession() for auth.
+
+Build:
+
+/products  (list page)
+- Table/cards: name, category, linked fabric name, selling_price, computed cost per piece, margin %, status badge
+- computed cost per piece = (meters_per_piece * fabric.avg_cost_per_meter) + stitching_cost_per_piece
+- margin % = (selling_price - cost per piece) / selling_price * 100
+- "Add Product" button -> /products/new
+- Only admin and staff can access (match existing role gating)
+
+/products/new  (add form)
+- Fields: name, category, description, selling_price, fabric (dropdown of active fabrics), meters_per_piece, stitching_cost_per_piece
+- LIVE preview as fields fill: when fabric + meters_per_piece are set, show "Fabric cost/piece = X". When stitching also set, show "Total cost/piece = Y" and "Margin = selling_price - Y (Z%)". This is display only, computed client-side from the selected fabric's avg_cost_per_meter.
+- Variants section: add multiple rows of {size, color, finished_stock_qty}. Require at least 1 variant.
+- On submit: insert product + all variants in a single transaction. Set each variant avg_finished_cost = 0 for now (it gets set when production happens).
+- On success: navigate to /products
+
+/products/[id]  (detail)
+- Product info + recipe (fabric, meters_per_piece, stitching cost)
+- Computed cost per piece, margin, margin %
+- Variants table: size, color, finished_stock_qty, avg_finished_cost
+- "New Production Job" button linking to /production/new?product=[id]  (page built in step 3)
+
+When done: tell me how to test. I will add a product with 2-3 variants in the browser and confirm the computed costs and list display look right BEFORE you build step 3. Stop here.
