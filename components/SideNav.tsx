@@ -72,10 +72,16 @@ const NAV_LINKS = [
   },
 ];
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function SideNav({ userName, userRole }: SideNavProps) {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
+
+  const initials = userName
+    .split(" ")
+    .map((w) => w[0])
+    .join("")
+    .slice(0, 2)
+    .toUpperCase();
 
   const handleSignOut = async () => {
     await signOut({ redirect: false });
@@ -86,54 +92,96 @@ export function SideNav({ userName, userRole }: SideNavProps) {
 
   return (
     <>
-      {/* Top header bar */}
-      <header className="fixed top-0 left-0 right-0 z-10 bg-card border-b border-border">
-        <div className="max-w-2xl mx-auto flex items-center h-16 px-4 gap-3">
+      {/* Top header bar — frosted glass */}
+      <header
+        className="fixed top-0 left-0 right-0 z-10 border-b border-border/60"
+        style={{ background: "color-mix(in srgb, var(--background) 82%, transparent)", backdropFilter: "blur(10px)", WebkitBackdropFilter: "blur(10px)" }}
+      >
+        <div className="max-w-2xl mx-auto flex items-center justify-between h-16 px-4">
+          {/* Hamburger */}
           <button
             onClick={() => setOpen(true)}
             aria-label="Open menu"
-            className="text-muted-foreground hover:text-foreground transition-colors"
+            className="w-[38px] h-[38px] flex items-center justify-center rounded-xl text-foreground transition-colors hover:bg-[var(--soft)]"
           >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75}
-                d="M4 6h16M4 12h16M4 18h16" />
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M4 6h16M4 12h16M4 18h16" />
             </svg>
           </button>
-          <span className="font-semibold text-base">Ruwa</span>
+
+          {/* Wordmark */}
+          <span
+            className="text-[22px] font-semibold tracking-[0.01em] text-foreground"
+            style={{ fontFamily: "var(--font-head)" }}
+          >
+            Ruwa
+          </span>
+
+          {/* Bell icon */}
+          <button
+            aria-label="Notifications"
+            className="w-[38px] h-[38px] flex items-center justify-center rounded-xl text-foreground transition-colors hover:bg-[var(--soft)]"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75}
+                d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6 6 0 10-12 0v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+            </svg>
+          </button>
         </div>
       </header>
 
-      {/* Overlay */}
-      {open && (
-        <div
-          className="fixed inset-0 bg-black/40 z-20"
-          onClick={() => setOpen(false)}
-          aria-hidden="true"
-        />
-      )}
-
-      {/* Side panel */}
+      {/* Scrim */}
       <div
-        className={`fixed top-0 left-0 bottom-0 w-64 z-30 bg-card border-r border-border flex flex-col transform transition-transform duration-300 ease-in-out ${
+        className={`fixed inset-0 z-20 transition-opacity duration-[250ms] ${
+          open ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
+        }`}
+        style={{ background: "rgba(50,28,32,0.42)", backdropFilter: "blur(1px)" }}
+        onClick={() => setOpen(false)}
+        aria-hidden="true"
+      />
+
+      {/* Side drawer */}
+      <div
+        className={`fixed top-0 left-0 bottom-0 w-[76%] max-w-[300px] z-30 bg-card flex flex-col pt-[50px] transition-transform duration-[280ms] ease-[cubic-bezier(0.4,0,0.2,1)] ${
           open ? "translate-x-0" : "-translate-x-full"
         }`}
+        style={{ boxShadow: "16px 0 40px -20px rgba(67,40,44,0.4)" }}
       >
-        {/* Panel header */}
-        <div className="h-16 flex items-center px-4 border-b border-border shrink-0">
-          <span className="font-semibold text-base">Ruwa</span>
+        {/* Drawer head */}
+        <div className="flex items-center justify-between px-[18px] pt-2">
+          <span
+            className="text-[22px] font-semibold tracking-[0.01em] text-foreground"
+            style={{ fontFamily: "var(--font-head)" }}
+          >
+            Ruwa
+          </span>
+          <button
+            onClick={() => setOpen(false)}
+            aria-label="Close menu"
+            className="w-[38px] h-[38px] flex items-center justify-center rounded-xl text-foreground hover:bg-[var(--soft)] transition-colors"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
         </div>
 
+        {/* Section tag */}
+        <p className="mx-[18px] mt-[6px] mb-[14px] text-[11.5px] font-semibold text-muted-foreground uppercase tracking-[0.03em]">
+          Navigation
+        </p>
+
         {/* Nav links */}
-        <nav className="flex-1 overflow-y-auto py-2">
+        <nav className="flex-1 overflow-y-auto px-3 flex flex-col gap-[2px]">
           {NAV_LINKS.map((link) => (
             <Link
               key={link.href}
               href={link.href}
               onClick={() => setOpen(false)}
-              className={`flex items-center gap-3 px-4 py-3 text-sm transition-colors ${
+              className={`flex items-center gap-[13px] px-[14px] py-3 text-[15px] rounded-xl transition-colors ${
                 isActive(link.href)
-                  ? "text-primary font-semibold bg-muted"
-                  : "text-muted-foreground hover:text-foreground hover:bg-muted"
+                  ? "bg-[var(--soft)] text-[var(--soft-foreground)] font-extrabold"
+                  : "font-semibold text-muted-foreground hover:bg-[var(--soft)] hover:text-[var(--soft-foreground)]"
               }`}
             >
               {link.icon}
@@ -142,17 +190,27 @@ export function SideNav({ userName, userRole }: SideNavProps) {
           ))}
         </nav>
 
-        {/* Sign out */}
-        <div className="border-t border-border p-4 shrink-0">
+        {/* Footer — user card + sign out */}
+        <div className="flex items-center gap-[11px] px-[18px] py-[14px] border-t border-border">
+          <div
+            className="w-10 h-10 rounded-full flex items-center justify-center font-extrabold text-sm shrink-0"
+            style={{ background: "var(--soft)", color: "var(--soft-foreground)" }}
+          >
+            {initials}
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-[14px] font-bold truncate text-foreground">{userName}</p>
+            <span className="text-[12px] text-muted-foreground font-semibold capitalize">{userRole}</span>
+          </div>
           <button
             onClick={handleSignOut}
-            className="flex items-center gap-3 w-full text-sm text-muted-foreground hover:text-foreground transition-colors"
+            aria-label="Sign out"
+            className="w-8 h-8 flex items-center justify-center rounded-lg text-muted-foreground hover:text-foreground hover:bg-[var(--soft)] transition-colors shrink-0"
           >
-            <svg className="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75}
                 d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
             </svg>
-            Sign out
           </button>
         </div>
       </div>

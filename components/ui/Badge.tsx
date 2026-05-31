@@ -9,13 +9,14 @@ export function Badge({ className, variant = "default", ...props }: BadgeProps) 
   return (
     <span
       className={cn(
-        "inline-flex items-center px-2 py-0.5 rounded text-xs font-medium",
+        "inline-flex items-center px-[10px] py-[3px] rounded-full",
+        "text-[11px] font-bold tracking-[0.02em] capitalize whitespace-nowrap",
         {
-          "bg-primary text-primary-foreground": variant === "default",
-          "bg-success text-success-foreground": variant === "success",
-          "bg-warning text-warning-foreground": variant === "warning",
-          "bg-destructive text-destructive-foreground": variant === "destructive",
-          "bg-muted text-muted-foreground": variant === "muted",
+          "badge-default": variant === "default",
+          "badge-success": variant === "success",
+          "badge-warning": variant === "warning",
+          "badge-destructive": variant === "destructive",
+          "badge-muted": variant === "muted",
         },
         className
       )}

@@ -1,43 +1,55 @@
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Mulish:wght@400;500;600;700;800&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
-  --background: #ffffff;
-  --foreground: #1c1917;
+  --background: #FBF6F2;
+  --foreground: #43282C;
 
-  --primary: #1c1917;
-  --primary-foreground: #fafaf9;
+  /* Derived radius for inputs & buttons — calc(--radius * 0.72) */
+  --radius-inner: calc(var(--radius) * 0.72);
 
-  --secondary: #f5f5f4;
-  --secondary-foreground: #1c1917;
+  --primary: #C16783;
+  --primary-foreground: #FFFFFF;
 
-  --muted: #f5f5f4;
-  --muted-foreground: #78716c;
+  --secondary: #F8EBEC;
+  --secondary-foreground: #9A5E72;
 
-  --accent: #e7e5e4;
-  --accent-foreground: #1c1917;
+  --muted: #F8EBEC;
+  --muted-foreground: #A0888C;
 
-  --border: #e7e5e4;
-  --input-border: #d6d3d1;
-  --ring: #1c1917;
+  --accent: #EFE2DC;
+  --accent-foreground: #43282C;
 
-  --card: #ffffff;
-  --card-foreground: #1c1917;
+  --border: #EFE2DC;
+  --input-border: #DDD0C8;
+  --ring: #C16783;
 
-  --destructive: #dc2626;
-  --destructive-foreground: #ffffff;
+  --card: #FFFFFF;
+  --card-foreground: #43282C;
 
-  --success: #16a34a;
-  --success-foreground: #ffffff;
+  --destructive: #C25B57;
+  --destructive-foreground: #FFFFFF;
 
-  --warning: #b45309;
-  --warning-foreground: #ffffff;
+  --success: #6E9B7A;
+  --success-foreground: #FFFFFF;
 
-  --radius: 0.5rem;
+  --warning: #BE8636;
+  --warning-foreground: #FFFFFF;
 
-  /* Centralized font token — swap here to retheme globally */
-  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --radius: 0.95rem;
+
+  /* Extended brand palette */
+  --gold: #C8A560;
+  --mauve: #9A6B86;
+  --soft: #F8EBEC;
+  --soft-foreground: #9A5E72;
+
+  /* Font tokens */
+  --font-sans: 'Mulish', system-ui, -apple-system, sans-serif;
+  --font-head: 'Cormorant Garamond', Georgia, serif;
 }
 
 @layer base {
@@ -50,5 +62,41 @@
     color: var(--foreground);
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
+  }
+}
+
+@layer components {
+  /* Primary button glow shadow */
+  .btn-shadow-primary {
+    box-shadow: 0 6px 16px -6px color-mix(in srgb, var(--primary) 70%, transparent);
+  }
+
+  /* Input / Select / Textarea shared focus ring */
+  .input-focus-ring:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 16%, transparent);
+    outline: none;
+  }
+
+  /* Badge variant backgrounds — use color-mix so they always match the palette */
+  .badge-default {
+    background: color-mix(in srgb, var(--primary) 16%, var(--card));
+    color: var(--primary);
+  }
+  .badge-success {
+    background: color-mix(in srgb, var(--success) 16%, var(--card));
+    color: color-mix(in srgb, var(--success) 72%, #000);
+  }
+  .badge-warning {
+    background: color-mix(in srgb, var(--warning) 18%, var(--card));
+    color: color-mix(in srgb, var(--warning) 78%, #000);
+  }
+  .badge-destructive {
+    background: color-mix(in srgb, var(--destructive) 16%, var(--card));
+    color: var(--destructive);
+  }
+  .badge-muted {
+    background: color-mix(in srgb, var(--muted-foreground) 16%, var(--card));
+    color: var(--muted-foreground);
   }
 }
