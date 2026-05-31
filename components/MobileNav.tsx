@@ -8,7 +8,7 @@ interface MobileNavProps {
   userRole: string;
 }
 
-export function MobileNav({ userName, userRole }: MobileNavProps) {
+export function MobileNav({ userName: _userName, userRole: _userRole }: MobileNavProps) {
   const pathname = usePathname();
 
   const handleSignOut = async () => {
