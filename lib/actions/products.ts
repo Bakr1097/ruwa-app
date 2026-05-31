@@ -1,5 +1,6 @@
 "use server";
 import { db } from "@/lib/db";
+import { withTransaction } from "@/lib/db/transaction";
 import { products, productVariants, fabrics } from "@/lib/db/schema";
 import { eq, asc } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
@@ -29,10 +30,9 @@ export async function createProduct(formData: FormData): Promise<void> {
   const variantInputs: VariantInput[] = JSON.parse(variantsJson || "[]");
   if (!variantInputs.length) throw new Error("At least one variant is required.");
 
-  // Generate ID in JS so both inserts can be batched without a result dependency.
   const productId = crypto.randomUUID();
 
-  await db.transaction(async (tx) => {
+  await withTransaction(async (tx) => {
     await tx.insert(products).values({
       id: productId,
       name,
