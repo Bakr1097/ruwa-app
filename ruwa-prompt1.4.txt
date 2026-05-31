@@ -1,0 +1,52 @@
+Phase 2 of the Ruwa app, step 1 of 3: database schema ONLY. Do not build any UI or pages yet.
+
+FIRST: read the existing Drizzle schema file and list every table that currently exists. Confirm auth is NextAuth v5 (NOT Neon Auth). Tell me what you found before writing anything.
+
+Then add these tables to the existing schema, matching the existing Drizzle patterns exactly:
+
+1. products
+   - id (uuid, pk)
+   - name (text, not null)
+   - category (text)
+   - description (text)
+   - selling_price (numeric, not null)
+   - fabric_id (uuid, FK -> fabrics.id, not null)
+   - meters_per_piece (numeric, not null)
+   - stitching_cost_per_piece (numeric, not null)
+   - status (text, default 'active')  -- 'active' | 'discontinued'
+   - created_at (timestamp, default now())
+
+2. product_variants
+   - id (uuid, pk)
+   - product_id (uuid, FK -> products.id, not null)
+   - size (text)   -- 'S'|'M'|'L'|'XL'|'Free Size'
+   - color (text)
+   - finished_stock_qty (integer, default 0)
+   - avg_finished_cost (numeric, default 0)  -- weighted-avg cost per finished piece, used for COGS later
+   - created_at (timestamp, default now())
+
+3. production_jobs
+   - id (uuid, pk)
+   - product_id (uuid, FK -> products.id, not null)
+   - fabric_id (uuid, FK -> fabrics.id, not null)
+   - meters_sent (numeric, not null)
+   - leftover_meters_returned (numeric, default 0)
+   - status (text, default 'pending')  -- 'pending' | 'completed'
+   - assigned_to (uuid, FK -> user_profiles.id, nullable)
+   - notes (text)
+   -- cost snapshot fields, filled at completion:
+   - fabric_avg_cost_at_completion (numeric, default 0)
+   - fabric_consumed_meters (numeric, default 0)
+   - cost_per_piece (numeric, default 0)
+   - created_at (timestamp, default now())
+   - completed_at (timestamp, nullable)
+
+4. production_job_outputs
+   - id (uuid, pk)
+   - job_id (uuid, FK -> production_jobs.id, not null)
+   - variant_id (uuid, FK -> product_variants.id, not null)
+   - pieces_produced (integer, not null)
+
+Add Drizzle relations where the existing schema uses them. Then run drizzle-kit generate and drizzle-kit migrate.
+
+When done: tell me the exact commands you ran, and confirm the 4 new tables exist. Do NOT build any UI yet — stop here so I can verify.

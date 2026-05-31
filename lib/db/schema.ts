@@ -115,3 +115,61 @@ export const fabricPurchases = pgTable("fabric_purchases", {
   note: text("note"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
+
+export const products = pgTable("products", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  name: text("name").notNull(),
+  category: text("category"),
+  description: text("description"),
+  sellingPrice: numeric("selling_price", { precision: 10, scale: 2 }).notNull(),
+  fabricId: uuid("fabric_id")
+    .notNull()
+    .references(() => fabrics.id),
+  metersPerPiece: numeric("meters_per_piece", { precision: 10, scale: 4 }).notNull(),
+  stitchingCostPerPiece: numeric("stitching_cost_per_piece", { precision: 10, scale: 2 }).notNull(),
+  status: text("status").notNull().default("active"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const productVariants = pgTable("product_variants", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  productId: uuid("product_id")
+    .notNull()
+    .references(() => products.id),
+  size: text("size"),
+  color: text("color"),
+  finishedStockQty: integer("finished_stock_qty").notNull().default(0),
+  avgFinishedCost: numeric("avg_finished_cost", { precision: 10, scale: 4 }).notNull().default("0"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const productionJobs = pgTable("production_jobs", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  productId: uuid("product_id")
+    .notNull()
+    .references(() => products.id),
+  fabricId: uuid("fabric_id")
+    .notNull()
+    .references(() => fabrics.id),
+  metersSent: numeric("meters_sent", { precision: 10, scale: 2 }).notNull(),
+  leftoverMetersReturned: numeric("leftover_meters_returned", { precision: 10, scale: 2 }).notNull().default("0"),
+  status: text("status").notNull().default("pending"),
+  assignedTo: text("assigned_to").references(() => userProfiles.id),
+  notes: text("notes"),
+  fabricAvgCostAtCompletion: numeric("fabric_avg_cost_at_completion", { precision: 10, scale: 4 }).notNull().default("0"),
+  fabricConsumedMeters: numeric("fabric_consumed_meters", { precision: 10, scale: 4 }).notNull().default("0"),
+  costPerPiece: numeric("cost_per_piece", { precision: 10, scale: 4 }).notNull().default("0"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  completedAt: timestamp("completed_at"),
+});
+
+export const productionJobOutputs = pgTable("production_job_outputs", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  jobId: uuid("job_id")
+    .notNull()
+    .references(() => productionJobs.id),
+  variantId: uuid("variant_id")
+    .notNull()
+    .references(() => productVariants.id),
+  piecesProduced: integer("pieces_produced").notNull(),
+});
