@@ -202,11 +202,17 @@ export function NewProductForm({ fabrics }: { fabrics: Fabric[] }) {
             <div key={i} className="flex gap-2 items-end">
               <div className="flex-1 space-y-1">
                 <Label className="text-xs text-muted-foreground font-normal">Size</Label>
-                <Input
-                  placeholder="S / M / L / XL / Free Size"
+                <Select
                   value={v.size}
                   onChange={(e) => updateVariant(i, "size", e.target.value)}
-                />
+                >
+                  <option value="">—</option>
+                  <option value="S">S</option>
+                  <option value="M">M</option>
+                  <option value="L">L</option>
+                  <option value="XL">XL</option>
+                  <option value="Free Size">Free Size</option>
+                </Select>
               </div>
               <div className="flex-1 space-y-1">
                 <Label className="text-xs text-muted-foreground font-normal">Color</Label>
