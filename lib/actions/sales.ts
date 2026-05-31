@@ -152,7 +152,7 @@ export async function createSale(formData: FormData): Promise<void> {
     .where(inArray(productVariants.id, variantIds));
 
   // Read all products involved (for selling price snapshot)
-  const productIds = [...new Set(variantRows.map((v) => v.productId))];
+  const productIds = Array.from(new Set(variantRows.map((v) => v.productId)));
   const productRows = await db
     .select({ id: products.id, sellingPrice: products.sellingPrice })
     .from(products)
