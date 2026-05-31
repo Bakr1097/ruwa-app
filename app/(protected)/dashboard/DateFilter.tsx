@@ -61,7 +61,7 @@ export function DateFilter({ from, to }: { from: string; to: string }) {
       <div className="flex gap-2">
         <Button
           size="sm"
-          variant={isPreset(week.from, week.to) ? "default" : "secondary"}
+          variant={isPreset(week.from, week.to) ? "primary" : "secondary"}
           onClick={() => navigate(week.from, week.to)}
           className="flex-1"
         >
@@ -69,7 +69,7 @@ export function DateFilter({ from, to }: { from: string; to: string }) {
         </Button>
         <Button
           size="sm"
-          variant={isPreset(month.from, month.to) ? "default" : "secondary"}
+          variant={isPreset(month.from, month.to) ? "primary" : "secondary"}
           onClick={() => navigate(month.from, month.to)}
           className="flex-1"
         >
@@ -77,7 +77,7 @@ export function DateFilter({ from, to }: { from: string; to: string }) {
         </Button>
         <Button
           size="sm"
-          variant={isPreset(year.from, year.to) ? "default" : "secondary"}
+          variant={isPreset(year.from, year.to) ? "primary" : "secondary"}
           onClick={() => navigate(year.from, year.to)}
           className="flex-1"
         >
