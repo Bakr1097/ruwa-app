@@ -1,0 +1,13 @@
+NEW DIAGNOSIS — confirmed from terminal logs:
+
+When the Add Fabric form is submitted, [createFabric] NEVER logs. There is no POST to the fabric action at all. The only POST is to /auth/sign-in, and that is where "failed to forward action response" fires. The createFabric action is never being invoked — every previous fix was pointed at the wrong place.
+
+This means the SIGN-IN / SESSION flow is broken: the session cookie is not being established correctly, so submitting any form bounces back to sign-in instead of running the server action.
+
+I need you to diagnose the auth flow itself, not fabric creation:
+1. After I sign in, is the session cookie (__Secure-neon-auth.local.session_data or equivalent) actually being SET in the browser? Add logging to confirm.
+2. Why does POST /auth/sign-in produce "failed to forward action response"? Is the sign-in itself using a server-side redirect that fails? 
+3. Read the LATEST official Neon Auth / Better Auth Next.js docs and show me the OFFICIAL, documented sign-in and session pattern. Compare it line by line against what we currently have. We may have diverged from the correct setup entirely.
+4. Tell me honestly: is our current Neon Auth integration set up the way the docs specify, or did we build a custom version that fights the framework?
+
+Do not change any code yet. Report the diagnosis and the official correct pattern first. I want to decide on approach before we edit.

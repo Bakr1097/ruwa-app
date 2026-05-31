@@ -1,0 +1,77 @@
+We're building "Ruwa" — an inventory + sales + expense management web app for a small modest-wear clothing brand (abayas / coord sets) that sells via Instagram & WhatsApp. Real operational use, ~3-4 staff, mobile-primary.
+
+STACK (non-negotiable, I've used it before):
+- Next.js 14 (App Router) + TypeScript
+- Neon (Postgres) via Drizzle ORM
+- Neon Auth for authentication (follow the LATEST official Neon Auth + Next.js setup docs — do not guess the API)
+- Tailwind CSS, mobile-first
+- Deploy target: Vercel
+
+This session = PHASE 1 ONLY. Do not build products, sales, or expenses yet. Just:
+1. Scaffold the Next.js 14 project into the current folder (run create-next-app in ".").
+2. Set up Drizzle ORM connected to Neon.
+3. Integrate Neon Auth (login/logout, protected routes).
+4. Build the database schema for Phase 1 (below).
+5. Build the fabric inventory UI (below).
+6. Seed 3 sample fabrics so it's not empty.
+
+IMPORTANT: When you need my Neon connection string and Neon Auth keys, STOP and ask me to paste them into the .env file. Do NOT invent placeholder credentials and move on. Set up .env.local with DATABASE_URL and the Neon Auth keys.
+
+STYLING ARCHITECTURE (important — the UI will be fully re-themed later to match brand aesthetics):
+- Do NOT hardcode colors, fonts, or spacing values in components. Ever.
+- Define all theme values as CSS variables in globals.css and map them in tailwind.config (semantic tokens: background, foreground, primary, secondary, muted, accent, border, etc.). Components reference tokens (e.g. bg-primary, text-foreground), never literal hex or color names.
+- Centralize fonts in one place so they can be swapped later.
+- Build small reusable UI primitives (Button, Card, Input, Badge, etc.) — shadcn/ui style — so restyling a primitive restyles it everywhere.
+- Keep business logic (data fetching, calculations) separate from presentation. JSX should be thin.
+The goal: a complete visual re-skin later should require changing theme tokens and primitive components only, not rewriting feature pages.
+
+PHASE 1 SCHEMA:
+
+user_profiles
+- id (references the Neon Auth user id)
+- email
+- full_name
+- role: enum ('admin','staff','workshop'), default 'staff'
+- created_at
+(First user to sign up should be set to 'admin'.)
+
+fabrics
+- id
+- name (e.g. "Black Nida")
+- color
+- supplier (nullable)
+- stock_meters (numeric, default 0)
+- avg_cost_per_meter (numeric, default 0)  -- weighted average, see logic below
+- reorder_threshold_meters (numeric, default 0)
+- status: enum ('active','discontinued'), default 'active'
+- notes (nullable)
+- created_at
+
+fabric_purchases
+- id
+- fabric_id (FK -> fabrics)
+- meters (numeric)
+- cost_per_meter (numeric)
+- total_cost (numeric = meters * cost_per_meter)
+- supplier (nullable)
+- purchase_date (date)
+- note (nullable)
+- created_at
+
+PURCHASE LOGIC (important):
+When a fabric_purchase is added:
+- fabrics.stock_meters += meters
+- recompute fabrics.avg_cost_per_meter as a WEIGHTED AVERAGE:
+  new_avg = ((old_stock * old_avg) + (meters * cost_per_meter)) / (old_stock + meters)
+(This weighted average will be used for accurate COGS in a later phase — get it right now.)
+
+PHASE 1 UI (mobile-first, clean, simple):
+- Login page (Neon Auth)
+- App shell with simple mobile nav
+- Fabrics list: each card shows name, color, stock in meters, avg cost/meter, and a clear LOW STOCK badge when stock_meters <= reorder_threshold_meters
+- "Add fabric" form (create a new fabric type)
+- "Log fabric purchase" form (pick existing fabric, enter meters / cost-per-meter / supplier / date)
+- Fabric detail page: shows that fabric's purchase history
+- Role gating: only 'admin' and 'staff' can access fabric pages (workshop role exists in schema but is parked for Phase 2)
+
+Keep it clean and minimal. Use Drizzle migrations (drizzle-kit). When done, tell me exactly which commands to run to push the schema and start the dev server, and confirm Phase 1 works before we move to Phase 2.

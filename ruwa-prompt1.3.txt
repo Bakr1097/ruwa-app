@@ -1,0 +1,34 @@
+We need to rip out Neon Auth completely and replace it with NextAuth.js v5 (auth.js). The reason: Neon Auth's middleware intercepts server action POSTs and returns a redirect, which causes "failed to forward action response [TypeError: fetch failed]" on every form submission. This is unfixable — it is a fundamental incompatibility.
+
+Everything else in the app is fine — keep all of it:
+- The database schema (fabrics, fabric_purchases, user_profiles tables)
+- All server actions (lib/actions/fabrics.ts, lib/actions/purchases.ts)
+- All UI pages and components
+- The Drizzle setup
+- The styling architecture
+
+ONLY replace the auth layer. Here is exactly what to do:
+
+1. Uninstall Neon Auth packages:
+npm uninstall @neondatabase/auth @neondatabase/auth-ui
+
+2. Install NextAuth.js v5:
+npm install next-auth@beta
+
+3. Set up NextAuth v5 with email/password using Credentials provider and the existing Neon/Drizzle database to store sessions and users. Use the DrizzleAdapter for NextAuth.
+
+4. Add NextAuth tables to the existing Drizzle schema (accounts, sessions, verification_tokens) and push the migration.
+
+5. Replace the auth middleware with NextAuth middleware — protect /fabrics/** and redirect unauthenticated users to /auth/sign-in.
+
+6. Replace the auth/sign-in and auth/sign-up pages with simple custom forms that call NextAuth signIn() and a custom register server action.
+
+7. Update lib/auth/server.ts to export a getServerSession() helper using NextAuth that works correctly inside server actions and server components WITHOUT making outbound HTTP calls.
+
+8. Update app/(protected)/layout.tsx to use the new getServerSession().
+
+9. Remove all references to @neondatabase/auth anywhere in the codebase.
+
+10. Test the full flow yourself: sign up → sign in → add a fabric → confirm [createFabric] called appears in terminal → confirm new fabric appears in list. Do not report success until you have verified this yourself.
+
+IMPORTANT RULE going forward: never call redirect() inside server actions. Navigation is always handled client-side after the action returns void. This rule is already implemented in the action files — keep it.

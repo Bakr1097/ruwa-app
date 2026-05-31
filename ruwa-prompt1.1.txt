@@ -1,0 +1,12 @@
+We have patched "failed to forward action response [TypeError: fetch failed]" four times and it keeps reappearing in different places (now on POST /auth/sign-in). Stop patching symptoms. Fix the root cause architecturally.
+
+Root cause: auth.getSession() makes an outbound HTTP fetch to the Neon Auth server during server-component render. When this happens during a server action's re-render or any redirect-bearing flow, undici tries to follow a redirect in that response and fails.
+
+Do this properly:
+1. Read the LATEST official Neon Auth (Better Auth) docs for the correct way to read the session SERVER-SIDE inside server actions and server components in Next.js 14 App Router. We may be using the wrong API entirely. Show me what the docs say is the correct pattern.
+2. Find EVERY place auth.getSession() is called across the whole codebase. List them.
+3. Establish ONE rule and apply it everywhere: route protection is handled by middleware ONLY (it already works). Server actions and pages must read the session in a way that does NOT trigger a redirect-following fetch.
+4. Fix the sign-in action too — if it uses a server redirect that fails to forward, switch to client-side navigation after successful sign-in.
+5. After fixing, test the FULL flow yourself: sign in, add a fabric, log a purchase. Confirm zero "failed to forward" errors in the terminal and the new fabric appears in the list.
+
+Do not report back until the entire flow works cleanly with no errors in the terminal.
