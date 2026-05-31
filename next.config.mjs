@@ -8,10 +8,6 @@ const nextConfig = {
       dynamic: 0,
     },
   },
-  // Prevent webpack from bundling ws and its native addon (bufferutil).
-  // Node.js loads them natively at runtime instead, avoiding the
-  // "bufferUtil.mask is not a function" error in server components.
-  serverExternalPackages: ["ws", "bufferutil"],
 };
 
 export default nextConfig;

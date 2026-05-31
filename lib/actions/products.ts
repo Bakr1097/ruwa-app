@@ -1,6 +1,5 @@
 "use server";
 import { db } from "@/lib/db";
-import { withTransaction } from "@/lib/db/transaction";
 import { products, productVariants, fabrics } from "@/lib/db/schema";
 import { eq, asc } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
@@ -32,8 +31,10 @@ export async function createProduct(formData: FormData): Promise<void> {
 
   const productId = crypto.randomUUID();
 
-  await withTransaction(async (tx) => {
-    await tx.insert(products).values({
+  // db.batch sends both inserts in one HTTP request and Neon executes them
+  // atomically — no WebSocket or ws package needed.
+  await db.batch([
+    db.insert(products).values({
       id: productId,
       name,
       category,
@@ -42,17 +43,16 @@ export async function createProduct(formData: FormData): Promise<void> {
       fabricId,
       metersPerPiece,
       stitchingCostPerPiece,
-    });
-
-    await tx.insert(productVariants).values(
+    }),
+    db.insert(productVariants).values(
       variantInputs.map((v) => ({
         productId,
         size: v.size?.trim() || null,
         color: v.color?.trim() || null,
         finishedStockQty: v.finishedStockQty ?? 0,
       }))
-    );
-  });
+    ),
+  ]);
 
   console.log("[createProduct] inserted:", name);
   revalidatePath("/products");

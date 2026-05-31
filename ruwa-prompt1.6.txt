@@ -1,0 +1,18 @@
+I'm a non-coder. Act as an expert senior developer. You've been going in circles on the database transaction setup, and I can't debug code for you. New rules:
+
+1. Do not ask me to fix code. If a terminal command fails, read the error and fix it yourself, then tell me what to test in the browser.
+2. Explain what you're doing in plain English, not code jargon.
+3. Keep Drizzle — do NOT switch ORMs. Phase 1 already works on Drizzle.
+
+The actual bug: createProduct fails with "bufferUtil.mask is not a function". This comes from the 'ws' WebSocket package, which the Neon serverless driver needs and which is breaking in this Windows + Next.js 14 environment. You keep re-applying the same broken setup.
+
+The real fix is to STOP needing the WebSocket driver at all. We only switched to it to get db.transaction(). But this app barely needs transactions, and Neon's HTTP driver supports a simpler batch API that runs multiple writes atomically without any WebSocket.
+
+Do this:
+1. First run "node -v" and tell me the Node version in plain English.
+2. Delete the WebSocket/Pool/ws transaction setup entirely. Remove the ws and bufferutil bits from next.config.mjs. Go back to ONE database connection using the neon-http driver for the whole app.
+3. Rewrite createProduct to insert the product and its variants using neon-http's batch API (db.batch([...])), which Neon runs as a single atomic operation over HTTP — no transaction(), no WebSocket, no ws package.
+4. Make sure nothing else in the app still imports the old transaction file.
+5. Restart the dev server fully (stop it, run npm run dev again) so config changes load.
+
+Then tell me, in plain English, to test creating a product with variants.
