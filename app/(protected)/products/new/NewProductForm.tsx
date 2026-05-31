@@ -90,7 +90,12 @@ export function NewProductForm({ fabrics }: { fabrics: Fabric[] }) {
 
         <div className="space-y-1.5">
           <Label htmlFor="category">Category</Label>
-          <Input id="category" name="category" placeholder="e.g. Abaya, Coord Set" />
+          <Select id="category" name="category">
+            <option value="">Select…</option>
+            <option value="Abayas">Abayas</option>
+            <option value="Cord Sets">Cord Sets</option>
+            <option value="Stoles">Stoles</option>
+          </Select>
         </div>
 
         <div className="space-y-1.5">

@@ -1,4 +1,4 @@
-import { MobileNav } from "./MobileNav";
+import { SideNav } from "./SideNav";
 
 interface AppShellProps {
   children: React.ReactNode;
@@ -9,10 +9,10 @@ interface AppShellProps {
 export function AppShell({ children, userName, userRole }: AppShellProps) {
   return (
     <div className="min-h-screen bg-background">
-      <main className="max-w-2xl mx-auto pb-20 min-h-screen">
+      <SideNav userName={userName} userRole={userRole} />
+      <main className="max-w-2xl mx-auto pt-16 min-h-screen">
         {children}
       </main>
-      <MobileNav userName={userName} userRole={userRole} />
     </div>
   );
 }
