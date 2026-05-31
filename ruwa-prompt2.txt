@@ -1,0 +1,9 @@
+Two changes. Read the existing codebase first and match all existing patterns.
+
+CHANGE 1 — Currency label PKR (not SAR):
+Everywhere in the app that displays a currency label, it currently says "SAR". Change all of them to "PKR". This is a label-only change — do not touch any numbers, calculations, or database values. Find every place SAR appears in the UI (product pages, sales pages, production pages, anywhere costs/prices/revenue/margin are shown) and replace with PKR. If the currency string is hardcoded in multiple files, consider centralizing it as a single constant so it's easy to change later — but only if that's a clean change; otherwise just replace each occurrence.
+
+CHANGE 2 — Show stock on the products list cards:
+On the /products list page, each product card currently shows name, category, fabric, selling price, cost, and margin. Add a total finished stock count to each card — the sum of finished_stock_qty across all of that product's variants. Label it clearly, e.g. "In stock: 12 pcs". This should be computed in the data fetch (sum the variant quantities per product), not by loading every variant into the UI. Keep using existing UI primitives and CSS variable tokens.
+
+After both changes, restart the dev server and tell me in plain English what to check: that prices everywhere now say PKR, and that the products list shows a stock count on each card.

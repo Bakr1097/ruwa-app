@@ -1,0 +1,20 @@
+Phase 4 of the Ruwa app, step 1 of 2: database schema ONLY. No UI yet.
+
+Read the existing schema file first and confirm sales, sale_items, products, product_variants tables exist. Match all existing Drizzle patterns.
+
+Add ONE table:
+
+expenses
+- id (uuid, pk)
+- expense_date (date, not null)
+- category (text, not null) -- 'ads' | 'packaging' | 'shipping' | 'overheads' | 'other'
+- description (text, nullable)
+- amount (numeric 10,2, not null)
+- created_by (uuid, FK -> user_profiles.id, nullable)
+- created_at (timestamp, default now())
+
+IMPORTANT: this table is ONLY for operating expenses (ads, packaging, shipping, overheads). Fabric purchases and stitching costs are NOT expenses — they are COGS handled through the product recipe and sales. Do not add anything fabric- or production-related here.
+
+Run drizzle-kit generate, trim the generated SQL to ONLY this new table (existing tables already live in Neon), then drizzle-kit migrate.
+
+When done, tell me the commands you ran and confirm the table exists. Stop here.

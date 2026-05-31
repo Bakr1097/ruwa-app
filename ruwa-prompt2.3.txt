@@ -1,0 +1,42 @@
+Phase 4, step 2 of 2: Expenses UI + P&L dashboard. Schema is migrated. Match all existing patterns: neon-http + Drizzle, db.batch() for multi-write atomic ops (no transactions/WebSocket), server actions return void and throw, client navigates via window.location.href, never redirect() in actions, unstable_noStore() on list/dashboard pages, CSS variable tokens only, reuse components/ui primitives, getServerSession() for auth, currency label PKR.
+
+Build TWO sections:
+
+=== EXPENSES ===
+
+/expenses (list)
+- Cards/table: expense_date, category badge, description, amount (PKR)
+- "Add Expense" button -> /expenses/new
+- Admin and staff can access
+- Add /expenses to the bottom nav
+
+/expenses/new (add form)
+- Fields: expense_date (date picker, default today), category (dropdown: ads / packaging / shipping / overheads / other), description (optional), amount (required, > 0)
+- On submit: insert expense row with created_by = current user. Navigate to /expenses.
+
+=== P&L DASHBOARD ===
+
+/dashboard (the P&L)
+- Add /dashboard to the bottom nav (make it the first/home tab)
+- DATE FILTER at top: preset buttons (This Week, This Month, This Year) + a custom range option (start date + end date pickers). Default to This Month.
+- All figures below respect the selected date range (filter sales by sale_date, expenses by expense_date).
+
+CALCULATIONS (critical — get the accounting right):
+- Revenue = sum of total_revenue from sales where order_status != 'returned' and sale_date in range
+- COGS = sum of total_cogs from sales where order_status != 'returned' and sale_date in range
+- Gross Profit = Revenue - COGS
+- Gross Margin % = Gross Profit / Revenue * 100 (guard divide-by-zero -> show 0)
+- Operating Expenses = sum of expenses.amount where expense_date in range
+- Net Profit = Gross Profit - Operating Expenses
+- Net Margin % = Net Profit / Revenue * 100 (guard divide-by-zero)
+RETURNED SALES are excluded from Revenue and COGS (order_status != 'returned'). This matches the Phase 3 rule.
+
+DISPLAY:
+- Top row of summary cards: Revenue, COGS, Gross Profit, Operating Expenses, Net Profit — each with PKR and the relevant margin % where applicable.
+- Per-product profitability table: for each product that sold in range, show units sold, revenue, COGS, gross profit. Computed from sale_items joined to sales (exclude returned sales), grouped by product.
+- Operating expenses breakdown: total per category (ads / packaging / shipping / overheads / other) for the range.
+- Inventory valuation card (NOT date-filtered — current snapshot): sum across all product_variants of (finished_stock_qty * avg_finished_cost), labelled "Current finished inventory value (PKR)".
+
+Keep all queries efficient (aggregate in the data fetch, don't load everything into the UI). Mobile-first layout, existing primitives and tokens only.
+
+When done, tell me in plain English how to test: add a couple of expenses, then open the dashboard and verify each number against the sales and expenses I entered.

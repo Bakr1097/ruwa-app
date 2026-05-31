@@ -50,10 +50,10 @@ export default async function ProductDetailPage({
         <div className="grid grid-cols-2 gap-3">
           <StatCard label="Fabric" value={product.fabricName} />
           <StatCard label="Meters / piece" value={`${meters.toFixed(3)} m`} />
-          <StatCard label="Fabric cost / piece" value={`${fabricCostPerPiece.toFixed(2)} SAR`} />
-          <StatCard label="Stitching / piece" value={`${stitching.toFixed(2)} SAR`} />
-          <StatCard label="Total cost / piece" value={`${totalCostPerPiece.toFixed(2)} SAR`} />
-          <StatCard label="Selling price" value={`${selling.toFixed(2)} SAR`} />
+          <StatCard label="Fabric cost / piece" value={`${fabricCostPerPiece.toFixed(2)} PKR`} />
+          <StatCard label="Stitching / piece" value={`${stitching.toFixed(2)} PKR`} />
+          <StatCard label="Total cost / piece" value={`${totalCostPerPiece.toFixed(2)} PKR`} />
+          <StatCard label="Selling price" value={`${selling.toFixed(2)} PKR`} />
         </div>
         <div
           className={`mt-3 rounded-lg border p-3 ${
@@ -62,7 +62,7 @@ export default async function ProductDetailPage({
         >
           <p className="text-xs text-muted-foreground">Margin</p>
           <p className={`text-base font-semibold mt-0.5 ${margin < 0 ? "text-destructive" : ""}`}>
-            {margin.toFixed(2)} SAR ({marginPct.toFixed(1)}%)
+            {margin.toFixed(2)} PKR ({marginPct.toFixed(1)}%)
           </p>
         </div>
       </section>

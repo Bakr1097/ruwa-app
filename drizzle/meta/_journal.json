@@ -8,6 +8,20 @@
       "when": 1780217463855,
       "tag": "0000_fearless_lady_vermin",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1780222765136,
+      "tag": "0001_striped_butterfly",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1780225072104,
+      "tag": "0002_legal_tattoo",
+      "breakpoints": true
     }
   ]
 }

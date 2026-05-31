@@ -99,7 +99,7 @@ export function NewProductForm({ fabrics }: { fabrics: Fabric[] }) {
         </div>
 
         <div className="space-y-1.5">
-          <Label htmlFor="sellingPrice">Selling price (SAR) *</Label>
+          <Label htmlFor="sellingPrice">Selling price (PKR) *</Label>
           <Input
             id="sellingPrice"
             name="sellingPrice"
@@ -147,7 +147,7 @@ export function NewProductForm({ fabrics }: { fabrics: Fabric[] }) {
         </div>
 
         <div className="space-y-1.5">
-          <Label htmlFor="stitchingCostPerPiece">Stitching cost per piece (SAR) *</Label>
+          <Label htmlFor="stitchingCostPerPiece">Stitching cost per piece (PKR) *</Label>
           <Input
             id="stitchingCostPerPiece"
             name="stitchingCostPerPiece"
@@ -166,13 +166,13 @@ export function NewProductForm({ fabrics }: { fabrics: Fabric[] }) {
           <div className="rounded-lg border border-border bg-muted/30 p-3 space-y-1.5 text-sm">
             <div className="flex justify-between">
               <span className="text-muted-foreground">Fabric cost/piece</span>
-              <span className="font-medium">{fabricCostPerPiece.toFixed(2)} SAR</span>
+              <span className="font-medium">{fabricCostPerPiece.toFixed(2)} PKR</span>
             </div>
             {totalCostPerPiece !== null && (
               <>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Total cost/piece</span>
-                  <span className="font-medium">{totalCostPerPiece.toFixed(2)} SAR</span>
+                  <span className="font-medium">{totalCostPerPiece.toFixed(2)} PKR</span>
                 </div>
                 {margin !== null && marginPct !== null && (
                   <div className="flex justify-between border-t border-border pt-1.5">
@@ -180,7 +180,7 @@ export function NewProductForm({ fabrics }: { fabrics: Fabric[] }) {
                     <span
                       className={`font-semibold ${margin >= 0 ? "text-foreground" : "text-destructive"}`}
                     >
-                      {margin.toFixed(2)} SAR ({marginPct.toFixed(1)}%)
+                      {margin.toFixed(2)} PKR ({marginPct.toFixed(1)}%)
                     </span>
                   </div>
                 )}

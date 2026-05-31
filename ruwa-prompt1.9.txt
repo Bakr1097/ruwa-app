@@ -1,0 +1,41 @@
+Phase 3, step 2 of 2: Sales UI. Schema is migrated. Match all existing patterns: neon-http + Drizzle, db.batch() for multi-write atomic operations (NO transactions/WebSocket), server actions return void and throw, client navigates via window.location.href, never redirect() in actions, unstable_noStore() on list/detail pages, CSS variable tokens only, reuse components/ui primitives, getServerSession() for auth.
+
+Build:
+
+/sales  (sales list)
+- Cards/table: sale date, items summary (e.g. "2x Black Nida M"), total_revenue, payment method, order_status badge (pending=yellow, delivered=green, returned=red)
+- "New Sale" button -> /sales/new
+- Admin and staff can access
+- Add /sales to the bottom nav alongside Fabrics, Products, Production
+
+/sales/new  (create sale)
+- Add one or more line items. Each line: product dropdown -> variant dropdown (size/color), qty
+- When a variant is picked, show its current finished_stock_qty and its selling price (from product.selling_price)
+- VALIDATION: qty must be >= 1 and <= variant.finished_stock_qty. If any variant has 0 stock, block selecting it / show "Out of stock". Block submit if any line exceeds available stock.
+- Fields: payment_method (dropdown: COD / bank_transfer / jazzcash / easypaisa), customer_note (optional)
+- Live preview: total revenue across all lines
+- ON SUBMIT (db.batch, atomic):
+    For each line item:
+      - snapshot selling_price = product.selling_price
+      - snapshot cost_per_piece = variant.avg_finished_cost (current value)
+      - line_revenue = qty * selling_price
+      - line_cogs = qty * cost_per_piece
+      - decrement variant.finished_stock_qty -= qty
+      - insert sale_items row
+    Insert sales row with order_status 'pending', total_revenue = sum of line_revenue, total_cogs = sum of line_cogs, created_by = current user
+  Navigate to /sales on success.
+
+/sales/[id]  (sale detail)
+- Show sale info: date, payment method, status, customer note, created by
+- Line items table: product+variant, qty, selling price, line revenue, cost per piece, line cogs
+- Totals: total revenue, total COGS, gross profit (revenue - cogs), margin %
+- STATUS ACTIONS:
+    - If 'pending': buttons "Mark Delivered" and "Mark Returned"
+    - "Mark Delivered" -> just set order_status='delivered'. No stock/money change (stock already decremented at sale).
+    - "Mark Returned" (db.batch, atomic): for each sale_item, restock variant.finished_stock_qty += qty (using the snapshotted cost is NOT needed for restock qty, just add qty back). Set order_status='returned'. The reversal of revenue/cogs is handled by EXCLUDING returned sales from P&L reporting later — but for now, also keep the row's totals intact for the audit trail.
+    - If already 'delivered': allow "Mark Returned" too (same restock logic).
+    - If 'returned': no actions, show read-only.
+
+IMPORTANT on returns and COGS: when status = 'returned', the sale's revenue and cogs should NOT count toward profit. Rather than zeroing the stored totals (we keep them for audit), the rule is: any P&L calculation counts only sales where order_status != 'returned'. Add a clear code comment stating this so Phase 4 reporting respects it.
+
+When done, tell me in plain English how to test: create a sale (confirm stock drops), mark delivered, create another and mark returned (confirm stock goes back up).

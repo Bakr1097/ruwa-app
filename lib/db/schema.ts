@@ -173,3 +173,47 @@ export const productionJobOutputs = pgTable("production_job_outputs", {
     .references(() => productVariants.id),
   piecesProduced: integer("pieces_produced").notNull(),
 });
+
+export const sales = pgTable("sales", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  saleDate: timestamp("sale_date").defaultNow().notNull(),
+  paymentMethod: text("payment_method").notNull(),
+  orderStatus: text("order_status").notNull().default("pending"),
+  customerNote: text("customer_note"),
+  totalRevenue: numeric("total_revenue", { precision: 10, scale: 2 })
+    .notNull()
+    .default("0"),
+  totalCogs: numeric("total_cogs", { precision: 10, scale: 2 })
+    .notNull()
+    .default("0"),
+  createdBy: text("created_by").references(() => userProfiles.id),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const saleItems = pgTable("sale_items", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  saleId: uuid("sale_id")
+    .notNull()
+    .references(() => sales.id),
+  variantId: uuid("variant_id")
+    .notNull()
+    .references(() => productVariants.id),
+  qty: integer("qty").notNull(),
+  sellingPrice: numeric("selling_price", { precision: 10, scale: 2 }).notNull(),
+  costPerPiece: numeric("cost_per_piece", { precision: 10, scale: 4 }).notNull(),
+  lineRevenue: numeric("line_revenue", { precision: 10, scale: 2 }).notNull(),
+  lineCogs: numeric("line_cogs", { precision: 10, scale: 2 }).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+// Operating expenses only (ads, packaging, shipping, overheads, other).
+// Fabric purchases and stitching costs are COGS — do not record them here.
+export const expenses = pgTable("expenses", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  expenseDate: date("expense_date").notNull(),
+  category: text("category").notNull(),
+  description: text("description"),
+  amount: numeric("amount", { precision: 10, scale: 2 }).notNull(),
+  createdBy: text("created_by").references(() => userProfiles.id),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});

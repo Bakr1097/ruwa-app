@@ -48,6 +48,10 @@ export default async function ProductsPage() {
                         <p className="text-xs text-muted-foreground">{p.category}</p>
                       )}
                       <p className="text-xs text-muted-foreground">{p.fabricName}</p>
+                      <p className="text-xs text-muted-foreground">
+                        In stock:{" "}
+                        <span className="font-medium text-foreground">{p.totalStock} pcs</span>
+                      </p>
                     </div>
                     <Badge variant={p.status === "active" ? "success" : "muted"} className="shrink-0">
                       {p.status}

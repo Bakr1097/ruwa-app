@@ -1,0 +1,9 @@
+The UI is broken after the last changes — the layout got too big and the product cards don't look like they did before. The PKR text change was fine, but the stock count addition (Change 2) damaged the card layout.
+
+Do this:
+1. Use git to check what changed. Run: git diff HEAD --stat  and  git diff HEAD on the products list page and any shared UI/card components you touched.
+2. The PKR label changes should STAY. Only the layout/styling damage from adding the stock count needs fixing.
+3. Restore the product card to its original clean layout, then add the "In stock: X pcs" info in a way that fits the existing design — small, consistent with the other info on the card, using the existing UI primitives and CSS tokens. Do not introduce new font sizes, new spacing values, or hardcoded styles.
+4. If you can't cleanly separate the good changes from the bad, fully revert the products list card to the last committed version (git checkout HEAD -- path/to/file) and re-apply ONLY the stock count as a small, minimal addition.
+
+Show me before you finish: confirm in plain English that the card looks like the original plus a small stock line, nothing else changed. Then restart the dev server and tell me what to check.

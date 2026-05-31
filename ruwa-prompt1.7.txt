@@ -1,0 +1,45 @@
+Build the production jobs UI. The schema is already migrated. Match all existing app patterns.
+
+Build:
+
+/production  (jobs list)
+- Cards/table: product name, fabric name, meters_sent, status badge, created date, assigned-to name
+- "New Job" button -> /production/new
+- Admin and staff can access. Workshop role can also access.
+
+/production/new  (create job)
+- If ?product= query param present, preselect that product
+- Select product (dropdown) -> show its linked fabric name and current fabric stock_meters
+- Fields: meters_sent (required), assign to (dropdown of workshop-role users, optional), notes
+- VALIDATION: meters_sent must be <= fabric's current stock_meters. Show clear error if not enough fabric.
+- ON SUBMIT (use db.batch() — no transactions, no WebSocket):
+    * insert production_job with status 'pending'
+    * fabrics.stock_meters -= meters_sent
+  Navigate to /production on success.
+
+/production/[id]  (job detail + completion)
+- Show job info: product, fabric, meters_sent, status, assigned to, notes, date
+- If status == 'pending', show a "Complete Job" form:
+    * leftover_meters_returned field (numeric, must be >= 0 and <= meters_sent)
+    * one row per product variant to enter pieces_produced (integer >= 0)
+    * at least 1 total piece required
+- ON COMPLETE (use db.batch() — no WebSocket):
+    1. fabrics.stock_meters += leftover_meters_returned
+    2. fabric_consumed = meters_sent - leftover_meters_returned
+    3. snapshot fabric_avg = fabric.avg_cost_per_meter at this moment
+    4. total_pieces = sum of all pieces_produced
+    5. cost_per_piece = (fabric_consumed * fabric_avg + product.stitching_cost_per_piece * total_pieces) / total_pieces
+    6. for each variant with pieces_produced > 0:
+         - old_qty = variant.finished_stock_qty
+         - old_cost = variant.avg_finished_cost
+         - new_qty = old_qty + pieces_produced
+         - new_avg_cost = ((old_qty * old_cost) + (pieces_produced * cost_per_piece)) / new_qty
+         - update variant: finished_stock_qty = new_qty, avg_finished_cost = new_avg_cost
+         - insert production_job_outputs row
+    7. update job: status='completed', leftover_meters_returned, fabric_avg_cost_at_completion, fabric_consumed_meters, cost_per_piece, completed_at=now()
+  Navigate to /production on success.
+- If status == 'completed': show read-only summary — fabric consumed, avg cost used, cost per piece, pieces per variant.
+
+Add /production link to the bottom nav alongside Fabrics and Products.
+
+When done, tell me in plain English how to test end to end.

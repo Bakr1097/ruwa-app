@@ -1,7 +1,7 @@
 "use server";
 import { db } from "@/lib/db";
 import { products, productVariants, fabrics } from "@/lib/db/schema";
-import { eq, asc } from "drizzle-orm";
+import { eq, asc, sum } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 
 interface VariantInput {
@@ -59,7 +59,7 @@ export async function createProduct(formData: FormData): Promise<void> {
 }
 
 export async function getProducts() {
-  return db
+  const productList = await db
     .select({
       id: products.id,
       name: products.name,
@@ -74,6 +74,23 @@ export async function getProducts() {
     .from(products)
     .innerJoin(fabrics, eq(products.fabricId, fabrics.id))
     .orderBy(asc(products.name));
+
+  if (productList.length === 0) return [];
+
+  const stockRows = await db
+    .select({
+      productId: productVariants.productId,
+      totalStock: sum(productVariants.finishedStockQty),
+    })
+    .from(productVariants)
+    .groupBy(productVariants.productId);
+
+  const stockMap = new Map(stockRows.map((r) => [r.productId, parseInt(r.totalStock ?? "0")]));
+
+  return productList.map((p) => ({
+    ...p,
+    totalStock: stockMap.get(p.id) ?? 0,
+  }));
 }
 
 export async function getActiveFabrics() {

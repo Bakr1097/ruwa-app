@@ -1,0 +1,31 @@
+Phase 3 of the Ruwa app, step 1 of 2: database schema ONLY. No UI yet.
+
+First read the existing schema file and confirm the products, product_variants tables exist. Match all existing Drizzle patterns.
+
+Add these tables:
+
+1. sales
+   - id (uuid, pk)
+   - sale_date (timestamp, default now())
+   - payment_method (text) -- 'COD' | 'bank_transfer' | 'jazzcash' | 'easypaisa'
+   - order_status (text, default 'pending') -- 'pending' | 'delivered' | 'returned'
+   - customer_note (text, nullable)
+   - total_revenue (numeric, default 0) -- sum of line revenue, filled at creation
+   - total_cogs (numeric, default 0) -- sum of line cogs, filled at creation
+   - created_by (uuid, FK -> user_profiles.id, nullable)
+   - created_at (timestamp, default now())
+
+2. sale_items
+   - id (uuid, pk)
+   - sale_id (uuid, FK -> sales.id, not null)
+   - variant_id (uuid, FK -> product_variants.id, not null)
+   - qty (integer, not null)
+   - selling_price (numeric, not null) -- price per piece at time of sale, snapshot
+   - cost_per_piece (numeric, not null) -- variant.avg_finished_cost at time of sale, snapshot
+   - line_revenue (numeric, not null) -- qty * selling_price
+   - line_cogs (numeric, not null) -- qty * cost_per_piece
+   - created_at (timestamp, default now())
+
+Run drizzle-kit generate, then trim the generated SQL to ONLY these 2 new tables (existing tables are already live in Neon), then drizzle-kit migrate.
+
+When done, tell me the commands you ran and confirm the 2 tables exist. Stop here.
